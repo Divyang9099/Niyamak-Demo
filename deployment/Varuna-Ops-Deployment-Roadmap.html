@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Varuna Ops — Deployment Roadmap</title>
+<style>
+  :root{
+    --navy:#0B1F3A;
+    --navy2:#13315C;
+    --teal:#0FB8AD;
+    --teal-d:#0a8f87;
+    --cyan:#19A7CE;
+    --gold:#E9B949;
+    --ink:#1c2733;
+    --muted:#5b6b7b;
+    --line:#e3e8ee;
+    --bg-soft:#f5f8fb;
+    --green:#2e9e6b;
+    --red:#d96459;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    font-size:11.2px;
+    line-height:1.5;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  @page{ size:A4; margin:14mm 13mm; }
+  .page{ page-break-after:always; }
+  .page:last-child{ page-break-after:auto; }
+  h1,h2,h3,h4{ margin:0; font-weight:700; color:var(--navy); }
+  p{ margin:0 0 8px; }
+  .muted{ color:var(--muted); }
+  .small{ font-size:9.6px; }
+  .tag{
+    display:inline-block; padding:2px 9px; border-radius:20px;
+    font-size:9px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+  }
+
+  /* ---------- COVER ---------- */
+  .cover{
+    height:267mm;
+    background:linear-gradient(150deg,#0B1F3A 0%,#13315C 55%,#0a8f87 130%);
+    color:#fff; border-radius:4px; padding:0; position:relative; overflow:hidden;
+  }
+  .cover .grid{
+    position:absolute; inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size:34px 34px;
+  }
+  .cover .orb{
+    position:absolute; border-radius:50%; filter:blur(2px); opacity:.25;
+  }
+  .cover .orb1{ width:280px;height:280px; right:-70px; top:-60px; background:radial-gradient(circle,#0FB8AD,transparent 70%); }
+  .cover .orb2{ width:340px;height:340px; left:-110px; bottom:-90px; background:radial-gradient(circle,#19A7CE,transparent 70%); }
+  .cover-inner{ position:relative; padding:30mm 22mm; height:100%; display:flex; flex-direction:column; }
+  .brandmark{ display:flex; align-items:center; gap:12px; }
+  .brandmark .dot{ width:42px;height:42px;border-radius:11px;
+    background:linear-gradient(135deg,#0FB8AD,#19A7CE);
+    display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#06202b;
+    box-shadow:0 6px 20px rgba(15,184,173,.45);}
+  .brandmark .name{ font-size:18px; font-weight:800; letter-spacing:.5px; }
+  .brandmark .sub{ font-size:9.5px; color:#a9c6d6; letter-spacing:2px; text-transform:uppercase; }
+  .cover h1{ color:#fff; font-size:46px; line-height:1.05; margin:0 0 14px; letter-spacing:-.5px; }
+  .cover h1 .hl{ background:linear-gradient(120deg,#0FB8AD,#E9B949); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .cover .lead{ font-size:14px; color:#cfe1ec; max-width:130mm; }
+  .cover .chips{ margin-top:20px; display:flex; flex-wrap:wrap; gap:8px; }
+  .cover .chip{ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2);
+    padding:6px 12px; border-radius:8px; font-size:10px; font-weight:600; }
+  .cover .meta{ margin-top:auto; display:flex; justify-content:space-between; align-items:flex-end;
+    border-top:1px solid rgba(255,255,255,.18); padding-top:14px; }
+  .cover .meta .k{ font-size:8.5px; text-transform:uppercase; letter-spacing:1.5px; color:#8fb0c2; }
+  .cover .meta .v{ font-size:12px; font-weight:700; }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .sec-head{ display:flex; align-items:center; gap:12px; margin:0 0 14px; padding-bottom:10px; border-bottom:2px solid var(--line); }
+  .sec-head .num{ width:30px;height:30px;border-radius:9px; flex:0 0 30px;
+    background:linear-gradient(135deg,var(--navy),var(--teal-d)); color:#fff;
+    display:flex;align-items:center;justify-content:center; font-weight:800; font-size:14px; }
+  .sec-head h2{ font-size:19px; }
+  .sec-head .kicker{ font-size:8.5px; letter-spacing:2px; text-transform:uppercase; color:var(--teal-d); font-weight:700; }
+
+  /* ---------- CARDS / TABLES ---------- */
+  table{ width:100%; border-collapse:collapse; margin:6px 0 12px; font-size:10.3px; }
+  th{ background:var(--navy); color:#fff; text-align:left; padding:8px 9px; font-weight:600; font-size:9.6px; letter-spacing:.3px; }
+  th:first-child{ border-top-left-radius:6px; } th:last-child{ border-top-right-radius:6px; }
+  td{ padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr:nth-child(even) td{ background:var(--bg-soft); }
+  .t-right{ text-align:right; } .t-center{ text-align:center; }
+  .total-row td{ background:var(--navy2)!important; color:#fff; font-weight:700; }
+
+  .grid2{ display:flex; gap:12px; } .grid2>*{ flex:1; }
+  .card{ border:1px solid var(--line); border-radius:10px; padding:13px 14px; background:#fff; }
+  .card.soft{ background:var(--bg-soft); }
+  .card h3{ font-size:13px; margin-bottom:6px; }
+  .card .price{ font-size:22px; font-weight:800; color:var(--navy); }
+  .card .price small{ font-size:11px; font-weight:600; color:var(--muted); }
+
+  ul.clean{ margin:6px 0 8px; padding-left:16px; } ul.clean li{ margin-bottom:3px; }
+  .pill-ok{ background:#e6f6ee; color:var(--green); } .pill-rec{ background:#fff4d9; color:#a87d12; }
+  .pill-ent{ background:#e7f0fb; color:#2563a8; } .pill-cur{ background:#e6f6f5; color:var(--teal-d); }
+
+  .arch{ display:flex; flex-direction:column; gap:9px; }
+  .arch-row{ display:flex; gap:9px; align-items:stretch; }
+  .node{ border:1.5px solid var(--line); border-radius:9px; padding:9px 11px; flex:1; background:#fff; position:relative; }
+  .node .lbl{ font-size:8px; text-transform:uppercase; letter-spacing:1px; color:var(--teal-d); font-weight:700; }
+  .node .ttl{ font-size:11.5px; font-weight:700; color:var(--navy); }
+  .node .desc{ font-size:9.2px; color:var(--muted); }
+  .node.accent{ border-color:var(--teal); background:#f2fbfa; }
+  .node.navy{ background:var(--navy); border-color:var(--navy); }
+  .node.navy .ttl,.node.navy .desc{ color:#fff; } .node.navy .lbl{ color:#7fe6dd; }
+  .flowlabel{ text-align:center; font-size:8.5px; color:var(--muted); margin:-3px 0; }
+
+  .timeline{ position:relative; margin-left:8px; padding-left:20px; border-left:2px solid var(--teal); }
+  .tl-item{ position:relative; margin-bottom:11px; }
+  .tl-item:before{ content:""; position:absolute; left:-26px; top:2px; width:12px;height:12px;border-radius:50%;
+    background:#fff; border:3px solid var(--teal); }
+  .tl-item .ph{ font-weight:700; color:var(--navy); font-size:11.5px; }
+  .tl-item .dur{ font-size:9px; color:#fff; background:var(--teal-d); padding:1px 7px; border-radius:10px; margin-left:6px; }
+
+  .callout{ border-left:4px solid var(--gold); background:#fffaf0; padding:10px 13px; border-radius:0 8px 8px 0; margin:10px 0; font-size:10px; }
+  .callout.teal{ border-color:var(--teal); background:#f0fbfa; }
+  .footer{ position:fixed; bottom:6mm; left:13mm; right:13mm; display:flex; justify-content:space-between;
+    font-size:8px; color:var(--muted); border-top:1px solid var(--line); padding-top:4px; }
+  .check{ color:var(--green); font-weight:800; } .cross{ color:var(--red); font-weight:800; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="page">
+  <div class="cover">
+    <div class="grid"></div>
+    <div class="orb orb1"></div><div class="orb orb2"></div>
+    <div class="cover-inner">
+      <div class="brandmark">
+        <div class="dot">V</div>
+        <div>
+          <div class="name">VARUNA&nbsp;OPS</div>
+          <div class="sub">Drone Operations Platform</div>
+        </div>
+      </div>
+
+      <div style="margin-top:34mm;">
+        <div class="tag" style="background:rgba(15,184,173,.2);color:#7fe6dd;border:1px solid rgba(15,184,173,.4);">Cloud Deployment Proposal</div>
+        <h1 style="margin-top:14px;">Production<br><span class="hl">Deployment Roadmap</span><br>&amp; Pricing Plan</h1>
+        <p class="lead">A complete, phased plan to take the Varuna Ops platform live on the cloud — covering where the frontend, backend, database, queue and file storage are hosted, the exact tools used at each layer, capacity &amp; storage estimates, and transparent monthly pricing across three budget tiers.</p>
+        <div class="chips">
+          <div class="chip">⚛️ React + Vite Frontend</div>
+          <div class="chip">🟢 Node.js API + Worker</div>
+          <div class="chip">🐘 PostgreSQL</div>
+          <div class="chip">⚡ Redis Queue</div>
+          <div class="chip">☁️ Cloudflare R2 Storage</div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div>
+          <div class="k">Prepared For</div>
+          <div class="v">Client / Stakeholder Review</div>
+        </div>
+        <div>
+          <div class="k">Document</div>
+          <div class="v">Deployment &amp; Pricing v1.0</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="k">Date</div>
+          <div class="v">June 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 1. EXEC SUMMARY + ARCHITECTURE ============ -->
+<div class="page">
+  <div class="sec-head">
+    <div class="num">1</div>
+    <div><div class="kicker">Overview</div><h2>Executive Summary &amp; System Architecture</h2></div>
+  </div>
+
+  <p>Varuna Ops is a <b>file-heavy, real-time drone operations platform</b>. It is not a single app — it is a set of cooperating services that must each be hosted on the right kind of infrastructure. The most important architectural fact for budgeting: each drone project produces <b>50–100 GB of raw imagery &amp; deliverables</b>, so <b>object storage</b> (not the server or database) is the component that grows the cost over time. We host that on <b>Cloudflare R2</b>, which charges for storage but — critically — has <b>zero egress fees</b>, so clients downloading large deliverables never trigger surprise bandwidth bills.</p>
+
+  <div class="grid2" style="margin:10px 0 4px;">
+    <div class="card soft"><div class="muted small">RECOMMENDED MONTHLY</div><div class="price">$85–95<small>/mo</small></div><div class="small muted">≈ ₹7,300–8,200 · managed, low-ops</div></div>
+    <div class="card soft"><div class="muted small">LEANEST START</div><div class="price">$11–14<small>/mo</small></div><div class="small muted">≈ ₹950–1,200 · single server</div></div>
+    <div class="card soft"><div class="muted small">GO-LIVE TIMELINE</div><div class="price">5–6<small> days</small></div><div class="small muted">From zero to production</div></div>
+  </div>
+
+  <h3 style="margin:14px 0 8px;font-size:13px;">Deployment Topology — what runs where</h3>
+  <div class="arch">
+    <div class="arch-row">
+      <div class="node accent"><div class="lbl">Layer 1 · Edge</div><div class="ttl">React + Vite Frontend</div><div class="desc">Static build (HTML/JS/CSS). Served from a global CDN — fast everywhere.</div></div>
+      <div class="node"><div class="lbl">Users</div><div class="ttl">Browser (Admin / PM / Pilot)</div><div class="desc">Web app + real-time Socket.IO updates &amp; notifications.</div></div>
+    </div>
+    <div class="flowlabel">▼ HTTPS / WebSocket (API calls) ▼</div>
+    <div class="arch-row">
+      <div class="node navy"><div class="lbl">Layer 2 · Compute</div><div class="ttl">API Service (Express)</div><div class="desc">HTTP API, auth, Socket.IO. Process: <i>varuna-api</i>.</div></div>
+      <div class="node navy"><div class="lbl">Layer 2 · Compute</div><div class="ttl">Background Worker</div><div class="desc">ZIP/export jobs, emails, scheduler. Process: <i>varuna-worker</i>.</div></div>
+    </div>
+    <div class="flowlabel">▼ data · jobs · files ▼</div>
+    <div class="arch-row">
+      <div class="node"><div class="lbl">Layer 3 · State</div><div class="ttl">🐘 PostgreSQL</div><div class="desc">Projects, users, pipeline, estimations, notifications.</div></div>
+      <div class="node"><div class="lbl">Layer 3 · State</div><div class="ttl">⚡ Redis</div><div class="desc">BullMQ job queue + scheduler lease.</div></div>
+      <div class="node accent"><div class="lbl">Layer 3 · State</div><div class="ttl">☁️ Cloudflare R2</div><div class="desc">Raw drone data &amp; deliverables (the big one — 50–100 GB/project).</div></div>
+    </div>
+    <div class="flowlabel">▼ outbound ▼</div>
+    <div class="arch-row">
+      <div class="node"><div class="lbl">Layer 4 · Services</div><div class="ttl">✉️ Email (SMTP / Resend)</div><div class="desc">Welcome, allocation, approval &amp; expiry notifications.</div></div>
+      <div class="node"><div class="lbl">Layer 4 · Services</div><div class="ttl">🌐 Cloudflare DNS + SSL</div><div class="desc">Domain, free TLS certificate, CDN, WAF.</div></div>
+    </div>
+  </div>
+
+  <div class="callout teal"><b>Why two compute processes?</b> Your <code>ecosystem.config.js</code> already splits the app into an <b>API</b> and a <b>worker</b>. Heavy jobs (zipping a 100 GB project for download, exports, scheduled license/maintenance checks) run on the worker so they never slow down or crash the live API. Every hosting tier below keeps this separation.</div>
+</div>
+
+<!-- ============ 2. TOOLING MATRIX ============ -->
+<div class="page">
+  <div class="sec-head">
+    <div class="num">2</div>
+    <div><div class="kicker">The Toolbox</div><h2>Every Tool &amp; Where Each Piece Deploys</h2></div>
+  </div>
+  <p>This is the complete list of platforms involved. For each layer we list the <b>recommended choice</b> plus solid alternatives, so the decision is transparent.</p>
+
+  <table>
+    <thead><tr>
+      <th style="width:15%;">Layer</th><th style="width:23%;">What deploys here</th>
+      <th style="width:20%;">Recommended tool</th><th style="width:25%;">Good alternatives</th><th>Role</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><b>Frontend</b></td><td>React + Vite static build</td><td><span class="tag pill-ok">Cloudflare Pages</span></td><td>Vercel · Netlify</td><td>Global CDN hosting of the web app</td></tr>
+      <tr><td><b>Backend API</b></td><td>Express + Socket.IO (<i>varuna-api</i>)</td><td><span class="tag pill-ok">Render</span> / Railway</td><td>Fly.io · Hetzner VPS · AWS ECS</td><td>Serves the HTTP API &amp; live updates</td></tr>
+      <tr><td><b>Worker</b></td><td>BullMQ jobs + scheduler (<i>varuna-worker</i>)</td><td><span class="tag pill-ok">Render Worker</span></td><td>Railway · Fly.io · same VPS</td><td>ZIP/export, emails, cron checks</td></tr>
+      <tr><td><b>Database</b></td><td>PostgreSQL</td><td><span class="tag pill-ok">Neon</span> / Supabase</td><td>Render PG · DO Managed · AWS RDS</td><td>Primary relational data store</td></tr>
+      <tr><td><b>Queue</b></td><td>Redis</td><td><span class="tag pill-ok">Upstash Redis</span></td><td>Render Key-Value · self-hosted</td><td>Background job queue</td></tr>
+      <tr><td><b>File storage</b></td><td>Drone data &amp; deliverables</td><td><span class="tag pill-cur">Cloudflare R2 (in use)</span></td><td>Backblaze B2 · AWS S3</td><td>Large object storage, free egress</td></tr>
+      <tr><td><b>Email</b></td><td>Transactional notifications</td><td><span class="tag pill-ok">Resend</span> / Brevo</td><td>AWS SES · SendGrid · Gmail SMTP</td><td>Outbound system emails</td></tr>
+      <tr><td><b>DNS / SSL / CDN</b></td><td>Domain &amp; certificates</td><td><span class="tag pill-ok">Cloudflare</span></td><td>Namecheap + Let's Encrypt</td><td>Routing, free TLS, DDoS shield</td></tr>
+      <tr><td><b>CI / CD</b></td><td>Auto-deploy on git push</td><td><span class="tag pill-ok">GitHub + Actions</span></td><td>Platform-native git deploys</td><td>Build &amp; release pipeline</td></tr>
+      <tr><td><b>Monitoring</b></td><td>Uptime &amp; error tracking</td><td><span class="tag pill-ok">UptimeRobot + Sentry</span></td><td>Better Stack · platform logs</td><td>Alerts when something breaks</td></tr>
+      <tr><td><b>Process mgr</b><br><span class="small muted">(VPS only)</span></td><td>Keeps API+worker alive</td><td><span class="tag pill-ok">PM2 (configured)</span></td><td>Docker Compose · systemd</td><td>Restart on crash, log rotation</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b>Already decided for you:</b> The codebase already uses <b>Cloudflare R2</b> for storage and ships a <b>PM2</b> process file. So storage and process-management tooling are settled — we only choose the hosting tier.</div>
+
+  <div class="grid2" style="margin-top:6px;">
+    <div class="card soft"><h3 style="font-size:12px;">🔑 One-time setup assets</h3>
+      <ul class="clean small">
+        <li>Domain name (e.g. <i>varunaops.com</i>)</li>
+        <li>Cloudflare account (DNS + Pages + R2)</li>
+        <li>Strong <code>JWT_SECRET</code> (<code>openssl rand -hex 64</code>)</li>
+        <li>R2 bucket + access keys</li>
+        <li>SMTP / Resend API key</li>
+      </ul>
+    </div>
+    <div class="card soft"><h3 style="font-size:12px;">🔒 Security must-dos at launch</h3>
+      <ul class="clean small">
+        <li>Rotate any DB password / secret ever shared</li>
+        <li>Never commit the real <code>.env</code></li>
+        <li>Restrict CORS to your domain (<code>FRONTEND_URL</code>)</li>
+        <li>Enable automated database backups</li>
+        <li>Force HTTPS everywhere (free via Cloudflare)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3. THREE TIERS ============ -->
+<div class="page">
+  <div class="sec-head">
+    <div class="num">3</div>
+    <div><div class="kicker">Choose Your Path</div><h2>Three Deployment Tiers</h2></div>
+  </div>
+  <p>Pricing scales with ambition. Pick based on expected users and how much you want to manage yourself. <b>All three keep the same architecture</b> — they differ only in <i>where</i> the pieces run and how much is managed for you.</p>
+
+  <div style="display:flex;gap:10px;">
+    <div class="card" style="border-top:4px solid var(--teal);">
+      <span class="tag pill-cur">Tier 1</span>
+      <h3 style="margin-top:6px;">Starter / Pilot</h3>
+      <div class="price" style="font-size:20px;">$11–14<small>/mo</small></div>
+      <div class="small muted" style="margin-bottom:8px;">≈ ₹950–1,200/mo</div>
+      <div class="small"><b>One VPS runs everything</b> (Hetzner) via Docker: API + worker + Postgres + Redis + Nginx.</div>
+      <ul class="clean small">
+        <li><span class="check">✓</span> Cheapest possible</li>
+        <li><span class="check">✓</span> Full control</li>
+        <li><span class="cross">✗</span> You manage backups, updates, security</li>
+        <li><span class="cross">✗</span> Single point of failure</li>
+      </ul>
+      <div class="small muted"><b>Best for:</b> demo, internal pilot, ≤ ~30 users.</div>
+    </div>
+
+    <div class="card" style="border-top:4px solid var(--gold); box-shadow:0 8px 24px rgba(11,31,58,.12);">
+      <span class="tag pill-rec">Tier 2 · Recommended</span>
+      <h3 style="margin-top:6px;">Growth / Managed</h3>
+      <div class="price" style="font-size:20px;">$85–95<small>/mo</small></div>
+      <div class="small muted" style="margin-bottom:8px;">≈ ₹7,300–8,200/mo</div>
+      <div class="small"><b>Managed cloud services</b> — each layer on a purpose-built platform with auto-backups &amp; git deploys.</div>
+      <ul class="clean small">
+        <li><span class="check">✓</span> Managed backups &amp; scaling</li>
+        <li><span class="check">✓</span> Auto-deploy on git push</li>
+        <li><span class="check">✓</span> Minimal ops burden</li>
+        <li><span class="cross">✗</span> Higher per-unit cost than a VPS</li>
+      </ul>
+      <div class="small muted"><b>Best for:</b> real production launch, paying clients, hundreds of users.</div>
+    </div>
+
+    <div class="card" style="border-top:4px solid var(--navy2);">
+      <span class="tag pill-ent">Tier 3</span>
+      <h3 style="margin-top:6px;">Enterprise / Scale</h3>
+      <div class="price" style="font-size:20px;">$280–380<small>/mo</small></div>
+      <div class="small muted" style="margin-bottom:8px;">≈ ₹24,000–32,700/mo</div>
+      <div class="small"><b>AWS high-availability</b>: multi-AZ database, load-balanced API, auto-scaling worker fleet.</div>
+      <ul class="clean small">
+        <li><span class="check">✓</span> High availability &amp; SLA</li>
+        <li><span class="check">✓</span> Auto-scales to thousands of users</li>
+        <li><span class="check">✓</span> Compliance-friendly</li>
+        <li><span class="cross">✗</span> Complex — needs a DevOps owner</li>
+      </ul>
+      <div class="small muted"><b>Best for:</b> large org, strict uptime, heavy concurrent load.</div>
+    </div>
+  </div>
+
+  <div class="callout teal" style="margin-top:14px;"><b>Our recommendation:</b> Launch on <b>Tier 2 (Growth / Managed)</b>. It gives you real production reliability — automated backups, zero-downtime deploys, and managed databases — without hiring a DevOps engineer. You can start Tier 1 for a demo and move up, or jump to Tier 3 only once concurrent load genuinely demands it. <b>Storage (R2) is billed separately on all tiers</b> and is detailed in Section 5.</p></div>
+
+  <div class="callout"><b>Note on scaling the API:</b> Today the API runs as a single instance (correct for Socket.IO without a shared adapter). To run multiple API instances behind a load balancer (Tier 3), the codebase needs the <code>@socket.io/redis-adapter</code> wired in — a small, well-understood change already noted in the project's own deployment comments.</div>
+</div>
+
+<!-- ============ 4. PRICING DETAIL ============ -->
+<div class="page">
+  <div class="sec-head">
+    <div class="num">4</div>
+    <div><div class="kicker">The Numbers</div><h2>Detailed Pricing Breakdown</h2></div>
+  </div>
+
+  <h3 style="font-size:12.5px;margin-bottom:2px;">Tier 1 — Starter / Pilot &nbsp;<span class="tag pill-cur">Single VPS</span></h3>
+  <table>
+    <thead><tr><th style="width:24%;">Component</th><th style="width:30%;">Service</th><th class="t-right" style="width:16%;">USD / mo</th><th class="t-right" style="width:14%;">INR / mo</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Server (all-in-one)</td><td>Hetzner CX32 — 4 vCPU, 8 GB, 80 GB SSD</td><td class="t-right">$9.00</td><td class="t-right">₹775</td><td>API+worker+PG+Redis in Docker</td></tr>
+      <tr><td>Frontend</td><td>Cloudflare Pages</td><td class="t-right">$0.00</td><td class="t-right">₹0</td><td>Free — unlimited bandwidth</td></tr>
+      <tr><td>Object storage</td><td>Cloudflare R2 (≈100 GB)</td><td class="t-right">$1.50</td><td class="t-right">₹130</td><td>Grows with data (Section 5)</td></tr>
+      <tr><td>Email</td><td>Resend / Brevo (free tier)</td><td class="t-right">$0.00</td><td class="t-right">₹0</td><td>Up to 3,000 emails/mo free</td></tr>
+      <tr><td>DNS / SSL / CDN</td><td>Cloudflare (free plan)</td><td class="t-right">$0.00</td><td class="t-right">₹0</td><td>Free TLS + DDoS shield</td></tr>
+      <tr><td>Domain</td><td>.com (amortized)</td><td class="t-right">$1.00</td><td class="t-right">₹86</td><td>≈ $12/yr</td></tr>
+      <tr class="total-row"><td colspan="2">TOTAL — Tier 1</td><td class="t-right">≈ $11.50</td><td class="t-right">≈ ₹990</td><td>+ storage as data grows</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size:12.5px;margin-bottom:2px;">Tier 2 — Growth / Managed &nbsp;<span class="tag pill-rec">Recommended</span></h3>
+  <table>
+    <thead><tr><th style="width:24%;">Component</th><th style="width:30%;">Service</th><th class="t-right" style="width:16%;">USD / mo</th><th class="t-right" style="width:14%;">INR / mo</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Backend API</td><td>Render Web Service — 2 GB RAM</td><td class="t-right">$25.00</td><td class="t-right">₹2,150</td><td>Always-on, auto-deploy</td></tr>
+      <tr><td>Worker</td><td>Render Background Worker — 512 MB</td><td class="t-right">$7.00</td><td class="t-right">₹600</td><td>Bump to $25 if exports heavy</td></tr>
+      <tr><td>Database</td><td>Neon Postgres — Launch (10 GB)</td><td class="t-right">$19.00</td><td class="t-right">₹1,635</td><td>Auto-backup + branching</td></tr>
+      <tr><td>Queue</td><td>Upstash Redis</td><td class="t-right">$10.00</td><td class="t-right">₹860</td><td>Free tier may suffice early</td></tr>
+      <tr><td>Frontend</td><td>Cloudflare Pages</td><td class="t-right">$0.00</td><td class="t-right">₹0</td><td>Free</td></tr>
+      <tr><td>Object storage</td><td>Cloudflare R2 (≈250 GB)</td><td class="t-right">$3.75</td><td class="t-right">₹325</td><td>Scales with projects</td></tr>
+      <tr><td>Email</td><td>Resend Pro (50k emails)</td><td class="t-right">$20.00</td><td class="t-right">₹1,720</td><td>Brevo $9 is a cheaper option</td></tr>
+      <tr><td>DNS / SSL / Domain</td><td>Cloudflare + .com</td><td class="t-right">$1.00</td><td class="t-right">₹86</td><td>Free DNS, domain amortized</td></tr>
+      <tr class="total-row"><td colspan="2">TOTAL — Tier 2</td><td class="t-right">≈ $85.75</td><td class="t-right">≈ ₹7,375</td><td>+ storage as data grows</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size:12.5px;margin-bottom:2px;">Tier 3 — Enterprise / Scale &nbsp;<span class="tag pill-ent">AWS HA</span></h3>
+  <table>
+    <thead><tr><th style="width:24%;">Component</th><th style="width:30%;">Service</th><th class="t-right" style="width:16%;">USD / mo</th><th class="t-right" style="width:14%;">INR / mo</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Frontend</td><td>S3 + CloudFront CDN</td><td class="t-right">$10.00</td><td class="t-right">₹860</td><td>Usage-based</td></tr>
+      <tr><td>Backend API</td><td>ECS Fargate — 2 tasks (HA)</td><td class="t-right">$90.00</td><td class="t-right">₹7,740</td><td>Load-balanced</td></tr>
+      <tr><td>Worker</td><td>ECS Fargate — 1 task</td><td class="t-right">$35.00</td><td class="t-right">₹3,010</td><td>Auto-scalable</td></tr>
+      <tr><td>Load balancer</td><td>Application Load Balancer</td><td class="t-right">$20.00</td><td class="t-right">₹1,720</td><td>+ sticky sessions for sockets</td></tr>
+      <tr><td>Database</td><td>RDS Postgres — t4g.medium Multi-AZ</td><td class="t-right">$130.00</td><td class="t-right">₹11,180</td><td>HA failover + backups</td></tr>
+      <tr><td>Queue</td><td>ElastiCache Redis — t4g.small</td><td class="t-right">$30.00</td><td class="t-right">₹2,580</td><td>Managed Redis</td></tr>
+      <tr><td>Object storage</td><td>Cloudflare R2 (≈1 TB)</td><td class="t-right">$15.00</td><td class="t-right">₹1,290</td><td>Kept on R2 (free egress)</td></tr>
+      <tr><td>Email</td><td>AWS SES</td><td class="t-right">$5.00</td><td class="t-right">₹430</td><td>$0.10 / 1,000 emails</td></tr>
+      <tr><td>DNS / WAF / Domain</td><td>Route 53 + Cloudflare</td><td class="t-right">$12.00</td><td class="t-right">₹1,030</td><td>Routing + firewall</td></tr>
+      <tr class="total-row"><td colspan="2">TOTAL — Tier 3</td><td class="t-right">≈ $347</td><td class="t-right">≈ ₹29,840</td><td>+ storage as data grows</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><b class="small">PRICING DISCLAIMER:</b> <span class="small">Figures are indicative list prices as of <b>early 2026</b> and exclude taxes/GST. Cloud providers adjust pricing and free-tier limits over time, and actual cost varies with real traffic, compute hours and storage volume. INR shown at ≈ ₹86/USD. Always confirm current pricing on each provider's site before committing. Storage (Cloudflare R2) is the main variable cost and is detailed next.</span></div>
+</div>
+
+<!-- ============ 5. STORAGE & CAPACITY ============ -->
+<div class="page">
+  <div class="sec-head">
+    <div class="num">5</div>
+    <div><div class="kicker">Capacity Planning</div><h2>Storage, Space &amp; Usage — How Much Can It Hold?</h2></div>
+  </div>
+
+  <p>Two very different kinds of "space" matter. The <b>database</b> stays small (records are tiny); the <b>object storage</b> is what grows, because every drone project carries tens of gigabytes of imagery and deliverables. Plan the budget around object storage.</p>
+
+  <div class="grid2" style="margin-bottom:8px;">
+    <div class="card soft"><h3 style="font-size:12px;">🐘 Database (PostgreSQL) — stays small</h3>
+      <p class="small" style="margin-bottom:4px;">Holds text records only: projects, users, pipeline, estimations, notifications.</p>
+      <ul class="clean small">
+        <li><b>10 GB</b> handles <b>tens of thousands</b> of projects &amp; users comfortably</li>
+        <li>Typical real usage in year one: <b>under 1–2 GB</b></li>
+        <li>Redis queue: a few hundred MB at most</li>
+      </ul>
+    </div>
+    <div class="card soft"><h3 style="font-size:12px;">☁️ Object storage (R2) — the one that grows</h3>
+      <p class="small" style="margin-bottom:4px;">Holds raw drone data &amp; deliverables. This is the real capacity question.</p>
+      <ul class="clean small">
+        <li>Each project ≈ <b>50–100 GB</b> (the platform is built for this)</li>
+        <li><b>No hard cap</b> — R2 bills per GB, grows infinitely</li>
+        <li><b>Egress is FREE</b> — client downloads cost nothing</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="font-size:12.5px;margin:10px 0 2px;">Cloudflare R2 storage cost by volume <span class="small muted">(at $0.015 / GB-month, free egress)</span></h3>
+  <table>
+    <thead><tr>
+      <th>Projects stored</th><th>Approx. data (≈75 GB ea.)</th><th class="t-right">Storage $/mo</th><th class="t-right">Storage ₹/mo</th><th class="t-right">$/yr</th><th>Comment</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>Up to ~13 GB</td><td>Free tier</td><td class="t-right">$0.00</td><td class="t-right">₹0</td><td class="t-right">$0</td><td>First 10 GB free</td></tr>
+      <tr><td>10 projects</td><td>≈ 0.75 TB</td><td class="t-right">$11.25</td><td class="t-right">₹970</td><td class="t-right">$135</td><td>Small operation</td></tr>
+      <tr><td>25 projects</td><td>≈ 1.9 TB</td><td class="t-right">$28.10</td><td class="t-right">₹2,420</td><td class="t-right">$337</td><td>Growing</td></tr>
+      <tr><td>50 projects</td><td>≈ 3.75 TB</td><td class="t-right">$56.25</td><td class="t-right">₹4,840</td><td class="t-right">$675</td><td>Busy team</td></tr>
+      <tr><td>100 projects</td><td>≈ 7.5 TB</td><td class="t-right">$112.50</td><td class="t-right">₹9,675</td><td class="t-right">$1,350</td><td>Large operation</td></tr>
+      <tr><td>250 projects</td><td>≈ 18.75 TB</td><td class="t-right">$281.25</td><td class="t-right">₹24,190</td><td class="t-right">$3,375</td><td>Enterprise archive</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout teal"><b>The free-egress advantage in numbers:</b> On AWS S3, a client downloading a 100 GB project deliverable would cost ≈ <b>$9 in egress every time</b>. On <b>Cloudflare R2 that download is $0</b>. For a platform whose whole point is delivering big files to clients, this single fact can save thousands of dollars a year — which is exactly why R2 was chosen.</div>
+
+  <h3 style="font-size:12.5px;margin:10px 0 2px;">Concurrent-user capacity (compute)</h3>
+  <table>
+    <thead><tr><th style="width:18%;">Tier</th><th>Comfortable concurrent users</th><th>What limits it</th><th>How to scale up</th></tr></thead>
+    <tbody>
+      <tr><td><b>Tier 1</b> VPS</td><td>~30–80 active</td><td>Single 8 GB server shared by all services</td><td>Bigger VPS, or split DB out</td></tr>
+      <tr><td><b>Tier 2</b> Managed</td><td>~200–500 active</td><td>Single API instance (Socket.IO)</td><td>Add Redis socket-adapter → multi-instance</td></tr>
+      <tr><td><b>Tier 3</b> AWS</td><td>Thousands</td><td>Effectively horizontal — add tasks</td><td>Auto-scaling group, larger RDS</td></tr>
+    </tbody>
+  </table>
+  <p class="small muted">"Active" = simultaneously interacting. Total registered users can be far higher; most aren't online at once. Large file uploads use resumable chunked sessions (up to 72 h) so slow links and 50–100 GB datasets are handled gracefully.</p>
+</div>
+
+<!-- ============ 6. ROADMAP ============ -->
+<div class="page">
+  <div class="sec-head">
+    <div class="num">6</div>
+    <div><div class="kicker">Execution Plan</div><h2>Step-by-Step Deployment Roadmap</h2></div>
+  </div>
+  <p>A clear, phased path from an empty cloud account to a live, secured production system. Total effort: roughly <b>5–6 working days</b> for the recommended (Tier 2) setup.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="ph">Phase 0 — Pre-flight &amp; accounts <span class="dur">~1 day</span></div>
+      <div class="small">Buy the domain. Create Cloudflare, hosting, database &amp; email accounts. Create the R2 bucket + access keys. Generate a strong <code>JWT_SECRET</code>. <b>Rotate any secret ever shared</b>. Draft the production <code>.env</code> (never commit it).</div>
+    </div>
+    <div class="tl-item">
+      <div class="ph">Phase 1 — Database <span class="dur">~½ day</span></div>
+      <div class="small">Provision managed PostgreSQL. Run migrations (<code>npm run migrate</code> — all 16+). Seed the first admin user. Confirm automated backups are on.</div>
+    </div>
+    <div class="tl-item">
+      <div class="ph">Phase 2 — Backend API + Worker <span class="dur">~1 day</span></div>
+      <div class="small">Deploy <i>varuna-api</i> and <i>varuna-worker</i> as two services. Set all env vars (DB, R2, Redis, SMTP). Connect Redis &amp; R2. Verify the <code>/health</code> endpoint and that a test job runs on the worker.</div>
+    </div>
+    <div class="tl-item">
+      <div class="ph">Phase 3 — Frontend <span class="dur">~½ day</span></div>
+      <div class="small">Set <code>VITE_API_URL</code> to the API domain. Build (<code>vite build</code>) and deploy to Cloudflare Pages. Attach the custom domain.</div>
+    </div>
+    <div class="tl-item">
+      <div class="ph">Phase 4 — Networking, domains &amp; SSL <span class="dur">~½ day</span></div>
+      <div class="small">Point DNS for app + API subdomains. Enable free TLS. Lock CORS &amp; Socket.IO origin to your domain via <code>FRONTEND_URL</code>. Confirm real-time updates work end-to-end.</div>
+    </div>
+    <div class="tl-item">
+      <div class="ph">Phase 5 — Hardening &amp; observability <span class="dur">~1 day</span></div>
+      <div class="small">Set up daily DB backups, uptime monitoring (UptimeRobot), error tracking (Sentry), and email-delivery checks. Verify rate-limiting &amp; security headers (Helmet) are active in production.</div>
+    </div>
+    <div class="tl-item">
+      <div class="ph">Phase 6 — Go-live &amp; handover <span class="dur">~½ day</span></div>
+      <div class="small">Full smoke test (login, project create, upload, export/ZIP, notifications, emails). Final DNS cutover. Hand over credentials, runbook &amp; monitoring dashboards.</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:10px;">
+    <div class="card soft"><h3 style="font-size:12px;">✅ Production-readiness today</h3>
+      <p class="small">The platform has been through multiple zero-bug stabilization passes — crashes fixed, migrations applied, security headers, rate-limiting, JWT auth, 2FA, RBAC and resumable uploads are all in place. Internal readiness is assessed at <b>~99%</b>.</p>
+    </div>
+    <div class="card soft"><h3 style="font-size:12px;">📋 Small pre-launch checklist</h3>
+      <ul class="clean small">
+        <li>Move background jobs to live Redis (currently optional)</li>
+        <li>Add Socket.IO Redis adapter before multi-instance</li>
+        <li>Cap ZIP memory for very large projects</li>
+        <li>Plan Node 22 upgrade (AWS SDK, by 2027)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 7. RECOMMENDATION / CLOSE ============ -->
+<div class="page">
+  <div class="sec-head">
+    <div class="num">7</div>
+    <div><div class="kicker">In Summary</div><h2>Recommendation &amp; Total Cost of Ownership</h2></div>
+  </div>
+
+  <p>For a real launch with paying clients, deploy on <b>Tier 2 (Growth / Managed)</b>. It delivers production-grade reliability — managed databases, automated backups, zero-downtime git deploys — without the overhead of running servers yourself, and it costs a fraction of the enterprise tier.</p>
+
+  <table>
+    <thead><tr>
+      <th>Tier</th><th class="t-right">Infra $/mo</th><th class="t-right">Infra ₹/mo</th><th class="t-right">+ Storage (50 proj.)</th><th class="t-right">≈ Total ₹/mo</th><th>Verdict</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><b>Tier 1</b> Starter</td><td class="t-right">$11.50</td><td class="t-right">₹990</td><td class="t-right">+$56</td><td class="t-right">₹5,800</td><td>Demo / pilot</td></tr>
+      <tr class="total-row"><td><b>Tier 2</b> Growth ⭐</td><td class="t-right">$85.75</td><td class="t-right">₹7,375</td><td class="t-right">+$56</td><td class="t-right">₹12,200</td><td>Recommended launch</td></tr>
+      <tr><td><b>Tier 3</b> Enterprise</td><td class="t-right">$347</td><td class="t-right">₹29,840</td><td class="t-right">+$56</td><td class="t-right">₹34,700</td><td>Large-scale / HA</td></tr>
+    </tbody>
+  </table>
+  <p class="small muted">Storage column assumes 50 active projects (~3.75 TB on R2). Storage is shared logic across tiers; it grows with your data, not with the tier.</p>
+
+  <div class="grid2" style="margin-top:6px;">
+    <div class="card"><h3 style="font-size:12.5px;color:var(--teal-d);">Why this plan is low-risk</h3>
+      <ul class="clean small">
+        <li><b>Start small, grow later</b> — begin on Tier 1/2, move up only when load demands</li>
+        <li><b>No vendor lock on storage</b> — R2 is S3-compatible; portable to S3/B2</li>
+        <li><b>Predictable bills</b> — free egress removes the scariest variable cost</li>
+        <li><b>Fast to launch</b> — ~5–6 days, codebase already production-hardened</li>
+      </ul>
+    </div>
+    <div class="card soft"><h3 style="font-size:12.5px;">Recommended stack at a glance</h3>
+      <table style="margin:4px 0 0;font-size:9.5px;">
+        <tr><td style="padding:4px 6px;"><b>Frontend</b></td><td style="padding:4px 6px;">Cloudflare Pages</td></tr>
+        <tr><td style="padding:4px 6px;"><b>API + Worker</b></td><td style="padding:4px 6px;">Render</td></tr>
+        <tr><td style="padding:4px 6px;"><b>Database</b></td><td style="padding:4px 6px;">Neon PostgreSQL</td></tr>
+        <tr><td style="padding:4px 6px;"><b>Queue</b></td><td style="padding:4px 6px;">Upstash Redis</td></tr>
+        <tr><td style="padding:4px 6px;"><b>Storage</b></td><td style="padding:4px 6px;">Cloudflare R2</td></tr>
+        <tr><td style="padding:4px 6px;"><b>Email</b></td><td style="padding:4px 6px;">Resend</td></tr>
+        <tr><td style="padding:4px 6px;"><b>DNS/SSL</b></td><td style="padding:4px 6px;">Cloudflare</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;background:linear-gradient(135deg,var(--navy),var(--teal-d));border-radius:12px;padding:20px 24px;color:#fff;">
+    <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#9fe3dc;">Next step</div>
+    <div style="font-size:17px;font-weight:800;margin:4px 0 6px;">Approve a tier &amp; we begin Phase 0</div>
+    <p style="color:#d6e7ee;font-size:10.5px;margin:0;">On approval we provision accounts, deploy all services, secure the domain with SSL, enable backups &amp; monitoring, and hand over a live, documented production environment within roughly one working week.</p>
+  </div>
+
+  <div style="margin-top:16px;text-align:center;" class="small muted">
+    Varuna Ops — Drone Operations Platform &nbsp;·&nbsp; Deployment &amp; Pricing Proposal v1.0 &nbsp;·&nbsp; June 2026<br>
+    Prices indicative (early-2026 list rates, ex-tax, ≈₹86/USD) — confirm current rates with each provider before purchase.
+  </div>
+</div>
+
+</body>
+</html>

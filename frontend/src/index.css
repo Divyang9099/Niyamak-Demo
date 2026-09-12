@@ -1,0 +1,410 @@
+/* ── Self-hosted fonts — load from localhost, zero CDN delay, zero FOUT ────
+   Material Symbols: the icon font. Served from /fonts/material-symbols.woff2
+   (stable path in public/) and PRELOADED in index.html so the download starts
+   at first HTML parse instead of after the JS+CSS chain (which caused a ~1s
+   raw-text flash). font-display:block renders nothing (not the raw ligature
+   name) during the brief load, so users never see "folder_open" as text.
+   Space Grotesk: UI body/heading font, bundled via @fontsource.            */
+@import '@fontsource-variable/space-grotesk/index.css';
+@font-face {
+  font-family: 'Material Symbols Outlined Variable';
+  font-style: normal;
+  font-display: block;
+  font-weight: 100 700;
+  src: url('/fonts/material-symbols.woff2') format('woff2-variations');
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Hide the browser's native password reveal/clear controls ──────────────
+   Windows browsers (Edge + some Chromium builds) inject their own eye / ✕ icon
+   inside type=password fields, which showed up as a SECOND eye next to our own
+   custom show/hide button on the login + reset pages. Suppress the native one
+   so only the app's eye remains. */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+/* ── Responsive density ───────────────────────────────────────────────────
+   The whole UI is built on rem-based spacing/typography, so scaling the root
+   font-size compresses EVERYTHING (text, padding, cards, gaps) proportionally.
+   This lets laptops with fewer CSS pixels show as much content as a large
+   monitor — the UI gets smaller and fits more.
+   Cumulative max-width rules (later overrides earlier) so there are NO gaps —
+   any width below a big monitor is compressed. Phones reset to a readable size
+   (they're single-column anyway). */
+html { font-size: 15px; }
+@media (max-width: 1280px) { html { font-size: 14px; } }
+@media (max-width: 768px)  { html { font-size: 15px; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VARUNA OPS DESIGN SYSTEM — THEME ENGINE
+   ─────────────────────────────────────────────────────────────────────────
+   Every color in the app resolves through the CSS variables below. Tailwind's
+   `slate`, status families (red/emerald/amber/blue/indigo/violet/green/orange)
+   and all semantic tokens (primary, surface, outline…) are remapped in
+   tailwind.config.cjs to `rgb(var(--…) / <alpha-value>)`.
+
+   → Changing [data-theme] on <html> re-skins the ENTIRE application:
+     sidebar, cards, tables, buttons, forms, charts, calendar — no page edits.
+
+   Themes:
+     obsidian  — Obsidian Prime   (default · dark graphite · purple accent)
+     light     — Corporate Light  (white · professional blue)
+     midnight  — Midnight Ops     (deep blue-black · cyan accent)
+     forest    — Forest Command   (dark green ops · emerald accent)
+     solar     — Solar Vision     (warm light · orange accent)
+
+   Variables are raw RGB triplets ("15 23 42") so Tailwind opacity modifiers
+   (e.g. bg-surface/80) keep working.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Corporate Light (also the :root fallback) ──────────────────────────── */
+:root, [data-theme='light'] {
+  color-scheme: light;
+
+  /* neutrals (Tailwind slate defaults) */
+  --sl-50: 248 250 252;  --sl-100: 241 245 249; --sl-200: 226 232 240;
+  --sl-300: 203 213 225; --sl-400: 148 163 184; --sl-500: 100 116 139;
+  --sl-600: 71 85 105;   --sl-700: 51 65 85;    --sl-800: 30 41 59;
+  --sl-900: 15 23 42;    --sl-950: 2 6 23;
+
+  /* status families (Tailwind defaults) */
+  --red-50: 254 242 242;  --red-100: 254 226 226; --red-200: 254 202 202; --red-300: 252 165 165;
+  --red-400: 248 113 113; --red-500: 239 68 68;   --red-600: 220 38 38;   --red-700: 185 28 28;  --red-800: 153 27 27;
+  --em-50: 236 253 245;   --em-100: 209 250 229;  --em-200: 167 243 208;  --em-300: 110 231 183;
+  --em-400: 52 211 153;   --em-500: 16 185 129;   --em-600: 5 150 105;    --em-700: 4 120 87;    --em-800: 6 95 70;
+  --am-50: 255 251 235;   --am-100: 254 243 199;  --am-200: 253 230 138;  --am-300: 252 211 77;
+  --am-400: 251 191 36;   --am-500: 245 158 11;   --am-600: 217 119 6;    --am-700: 180 83 9;    --am-800: 146 64 14;
+  --bl-50: 239 246 255;   --bl-100: 219 234 254;  --bl-200: 191 219 254;  --bl-300: 147 197 253;
+  --bl-400: 96 165 250;   --bl-500: 59 130 246;   --bl-600: 37 99 235;    --bl-700: 29 78 216;   --bl-800: 30 64 175;
+  --in-50: 238 242 255;   --in-100: 224 231 255;  --in-200: 199 210 254;  --in-300: 165 180 252;
+  --in-400: 129 140 248;  --in-500: 99 102 241;   --in-600: 79 70 229;    --in-700: 67 56 202;   --in-800: 55 48 163;  --in-950: 30 27 75;
+  --vi-50: 245 243 255;   --vi-100: 237 233 254;  --vi-200: 221 214 254;  --vi-300: 196 181 253;
+  --vi-400: 167 139 250;  --vi-500: 139 92 246;   --vi-600: 124 58 237;   --vi-700: 109 40 217;  --vi-800: 91 33 182;
+  --gr-50: 240 253 244;   --gr-100: 220 252 231;  --gr-200: 187 247 208;  --gr-300: 134 239 172;
+  --gr-400: 74 222 128;   --gr-500: 34 197 94;    --gr-600: 22 163 74;    --gr-700: 21 128 61;   --gr-800: 22 101 52;
+  --or-50: 255 247 237;   --or-100: 255 237 213;  --or-200: 254 215 170;  --or-300: 253 186 116;
+  --or-400: 251 146 60;   --or-500: 249 115 22;   --or-600: 234 88 12;    --or-700: 194 65 12;   --or-800: 154 52 18;
+
+  /* semantic */
+  --c-bg: 245 246 250;            /* app background       */
+  --c-surface: 255 255 255;       /* cards, panels        */
+  --c-surface-low: 250 251 252;   /* subtle panel         */
+  --c-surface-high: 241 242 246;  /* raised tint          */
+  --c-primary: 37 99 235;         /* blue-600             */
+  --c-primary-dark: 29 78 216;
+  --c-primary-container: 239 246 255;
+  --c-on-primary: 255 255 255;
+  --c-on-primary-container: 30 58 138;
+
+  /* elevation */
+  --shadow-soft: 0 1px 3px rgba(15,23,42,.04), 0 1px 2px rgba(15,23,42,.03);
+  --shadow-card: 0 2px 8px rgba(15,23,42,.04), 0 1px 3px rgba(15,23,42,.03);
+  --shadow-pop:  0 10px 30px rgba(15,23,42,.10);
+  --shadow-glow: 0 4px 14px rgb(var(--c-primary) / .25);
+
+  /* charts (recharts reads these via var() strings) */
+  --chart-1: #2563eb; --chart-2: #10b981; --chart-3: #f59e0b;
+  --chart-4: #8b5cf6; --chart-5: #ef4444; --chart-6: #06b6d4;
+
+  --scrollbar-thumb: 203 213 225;
+  --scrollbar-thumb-hover: 148 163 184;
+}
+
+/* ── Shared dark-theme status palette (tinted chips, luminous text) ─────── */
+[data-theme='obsidian'], [data-theme='midnight'], [data-theme='forest'] {
+  color-scheme: dark;
+
+  /* Shade contract on dark themes:
+     50–300  = dark tinted fills/borders (chips, alerts)
+     400–500 = unchanged accents
+     600     = solid mid-tone — usable as a button bg under white text AND
+               readable as text on dark surfaces
+     700–800 = luminous text shades (chip text, emphasis)               */
+  --red-50: 44 23 27;   --red-100: 61 30 35;   --red-200: 96 42 49;   --red-300: 134 53 61;
+  --red-400: 248 113 113; --red-500: 239 68 68; --red-600: 240 82 82;  --red-700: 255 158 158; --red-800: 255 186 186;
+  --em-50: 15 39 31;    --em-100: 20 52 41;    --em-200: 28 73 57;    --em-300: 38 98 76;
+  --em-400: 52 211 153; --em-500: 16 185 129;  --em-600: 22 194 137;  --em-700: 116 233 200; --em-800: 152 241 217;
+  --am-50: 45 35 13;    --am-100: 61 46 16;    --am-200: 89 66 20;    --am-300: 122 90 25;
+  --am-400: 251 191 36; --am-500: 245 158 11;  --am-600: 246 168 29;  --am-700: 253 217 116; --am-800: 254 230 156;
+  --bl-50: 21 31 50;    --bl-100: 27 40 66;    --bl-200: 37 55 92;    --bl-300: 49 74 125;
+  --bl-400: 96 165 250; --bl-500: 59 130 246;  --bl-600: 76 142 248;  --bl-700: 157 198 255; --bl-800: 190 217 255;
+  --in-50: 29 31 58;    --in-100: 36 39 74;    --in-200: 48 52 100;   --in-300: 64 69 133;
+  --in-400: 129 140 248; --in-500: 99 102 241; --in-600: 112 116 244; --in-700: 177 183 255; --in-800: 202 206 255; --in-950: 235 237 255;
+  --vi-50: 33 27 55;    --vi-100: 42 34 71;    --vi-200: 56 45 96;    --vi-300: 75 60 128;
+  --vi-400: 167 139 250; --vi-500: 139 92 246; --vi-600: 150 108 248; --vi-700: 201 183 255; --vi-800: 219 207 255;
+  --gr-50: 17 39 23;    --gr-100: 23 51 30;    --gr-200: 32 71 42;    --gr-300: 44 96 57;
+  --gr-400: 74 222 128; --gr-500: 34 197 94;   --gr-600: 48 206 106;  --gr-700: 136 239 173; --gr-800: 168 246 196;
+  --or-50: 46 30 15;    --or-100: 62 40 19;    --or-200: 90 57 26;    --or-300: 123 78 34;
+  --or-400: 251 146 60; --or-500: 249 115 22;  --or-600: 250 126 38;  --or-700: 254 188 130; --or-800: 255 209 163;
+
+  --shadow-soft: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.30);
+  --shadow-card: 0 2px 10px rgba(0,0,0,.40), 0 1px 3px rgba(0,0,0,.30);
+  --shadow-pop:  0 14px 40px rgba(0,0,0,.55);
+}
+
+/* ── Obsidian Prime — dark graphite · purple (DEFAULT) ──────────────────── */
+[data-theme='obsidian'] {
+  --sl-50: 30 31 38;   --sl-100: 37 38 47;  --sl-200: 48 50 61;  --sl-300: 64 67 80;
+  --sl-400: 139 145 160; --sl-500: 154 161 178; --sl-600: 182 188 201; --sl-700: 210 214 224;
+  --sl-800: 230 233 239; --sl-900: 243 244 248; --sl-950: 250 250 252;
+
+  --c-bg: 18 19 23;
+  --c-surface: 26 27 33;
+  --c-surface-low: 22 23 28;
+  --c-surface-high: 35 36 44;
+  --c-primary: 139 92 246;          /* violet-500 */
+  --c-primary-dark: 124 58 237;
+  --c-primary-container: 42 36 64;
+  --c-on-primary: 255 255 255;
+  --c-on-primary-container: 196 181 253;
+
+  --shadow-glow: 0 4px 16px rgb(139 92 246 / .35);
+  --chart-1: #a78bfa; --chart-2: #34d399; --chart-3: #fbbf24;
+  --chart-4: #60a5fa; --chart-5: #f87171; --chart-6: #22d3ee;
+  --scrollbar-thumb: 64 67 80;
+  --scrollbar-thumb-hover: 96 100 116;
+}
+
+/* ── Midnight Ops — deep blue-black · cyan ──────────────────────────────── */
+[data-theme='midnight'] {
+  --sl-50: 20 27 42;   --sl-100: 27 35 53;  --sl-200: 38 48 70;  --sl-300: 53 65 92;
+  --sl-400: 133 145 168; --sl-500: 148 161 184; --sl-600: 176 188 209; --sl-700: 205 214 230;
+  --sl-800: 227 233 243; --sl-900: 241 245 251; --sl-950: 250 252 255;
+
+  --c-bg: 7 11 20;
+  --c-surface: 13 18 30;
+  --c-surface-low: 10 15 25;
+  --c-surface-high: 20 27 42;
+  --c-primary: 34 211 238;          /* cyan-400 */
+  --c-primary-dark: 6 182 212;
+  --c-primary-container: 12 45 56;
+  --c-on-primary: 6 28 36;
+  --c-on-primary-container: 165 243 252;
+
+  --shadow-glow: 0 4px 16px rgb(34 211 238 / .30);
+  --chart-1: #22d3ee; --chart-2: #34d399; --chart-3: #fbbf24;
+  --chart-4: #a78bfa; --chart-5: #f87171; --chart-6: #60a5fa;
+  --scrollbar-thumb: 53 65 92;
+  --scrollbar-thumb-hover: 80 95 128;
+}
+
+/* ── Forest Command — dark green operations ─────────────────────────────── */
+[data-theme='forest'] {
+  --sl-50: 22 32 25;   --sl-100: 29 42 33;  --sl-200: 40 56 45;  --sl-300: 56 76 62;
+  --sl-400: 138 153 142; --sl-500: 152 168 156; --sl-600: 180 194 184; --sl-700: 208 219 211;
+  --sl-800: 229 237 231; --sl-900: 242 248 244; --sl-950: 250 253 251;
+
+  --c-bg: 10 16 12;
+  --c-surface: 16 24 18;
+  --c-surface-low: 13 20 15;
+  --c-surface-high: 24 34 27;
+  --c-primary: 52 211 153;          /* emerald-400 */
+  --c-primary-dark: 16 185 129;
+  --c-primary-container: 18 48 36;
+  --c-on-primary: 5 36 25;
+  --c-on-primary-container: 134 239 172;
+
+  --shadow-glow: 0 4px 16px rgb(52 211 153 / .28);
+  --chart-1: #34d399; --chart-2: #60a5fa; --chart-3: #fbbf24;
+  --chart-4: #a78bfa; --chart-5: #f87171; --chart-6: #22d3ee;
+  --scrollbar-thumb: 56 76 62;
+  --scrollbar-thumb-hover: 84 110 92;
+}
+
+/* ── Solar Vision — warm light · orange ─────────────────────────────────── */
+[data-theme='solar'] {
+  color-scheme: light;
+
+  --sl-50: 250 247 241;  --sl-100: 245 240 232; --sl-200: 231 224 213; --sl-300: 209 199 184;
+  --sl-400: 160 150 134; --sl-500: 118 109 95;  --sl-600: 87 80 68;    --sl-700: 63 57 48;
+  --sl-800: 41 36 30;    --sl-900: 26 22 18;    --sl-950: 13 11 9;
+
+  --c-bg: 250 247 240;
+  --c-surface: 255 255 255;
+  --c-surface-low: 253 251 246;
+  --c-surface-high: 245 240 232;
+  --c-primary: 234 88 12;           /* orange-600 */
+  --c-primary-dark: 194 65 12;
+  --c-primary-container: 255 237 213;
+  --c-on-primary: 255 255 255;
+  --c-on-primary-container: 124 45 18;
+
+  --shadow-soft: 0 1px 3px rgba(67,40,12,.05), 0 1px 2px rgba(67,40,12,.04);
+  --shadow-card: 0 2px 8px rgba(67,40,12,.05), 0 1px 3px rgba(67,40,12,.04);
+  --shadow-pop:  0 10px 30px rgba(67,40,12,.12);
+  --shadow-glow: 0 4px 14px rgb(234 88 12 / .25);
+  --chart-1: #ea580c; --chart-2: #16a34a; --chart-3: #d97706;
+  --chart-4: #7c3aed; --chart-5: #dc2626; --chart-6: #0891b2;
+  --scrollbar-thumb: 209 199 184;
+  --scrollbar-thumb-hover: 160 150 134;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+  body {
+    background-color: rgb(var(--c-bg));
+    color: rgb(var(--sl-900));
+    /* 'Space Grotesk Variable' is the exact font-family name @fontsource-variable installs */
+    font-family: 'Space Grotesk Variable', 'Space Grotesk', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Unified keyboard focus ring — every interactive element, every theme */
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-primary) / .7);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: rgb(var(--c-primary) / .25);
+  }
+}
+
+/* ── Keyboard shortcut badge ────────────────────────────────────────────── */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 5px;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  color: rgb(100 116 139);
+  background: rgb(248 250 252);
+  border: 1px solid rgb(226 232 240);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+}
+
+/* ── Smooth theme switching (class added briefly by ThemeContext) ───────── */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color .25s ease, border-color .25s ease,
+              color .2s ease, fill .2s ease, box-shadow .25s ease !important;
+}
+
+/* ── Micro-interactions ─────────────────────────────────────────────────── */
+@keyframes vfade-in   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes vscale-in  { from { opacity: 0; transform: scale(.96) translateY(6px); }
+                        to   { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes vslide-up  { from { opacity: 0; transform: translateY(10px); }
+                        to   { opacity: 1; transform: translateY(0); } }
+@keyframes vshimmer   { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+.animate-fade-in  { animation: vfade-in .18s ease-out both; }
+.animate-scale-in { animation: vscale-in .22s cubic-bezier(.16,1,.3,1) both; }
+.animate-slide-up { animation: vslide-up .28s cubic-bezier(.16,1,.3,1) both; }
+
+/* Skeleton shimmer — layered over bg-slate-100 blocks */
+.skeleton-shimmer {
+  background-image: linear-gradient(90deg,
+    transparent 25%, rgb(var(--sl-300) / .35) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: vshimmer 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in, .animate-scale-in, .animate-slide-up, .skeleton-shimmer {
+    animation: none !important;
+  }
+  html.theme-transition * { transition: none !important; }
+}
+
+/* ── Material Symbols icon rendering ───────────────────────────────────── */
+/* While the icon font is downloading, <html> carries the 'fonts-loading' class
+   (set by the guard script in index.html). Hide the raw ligature text until the
+   font is ready so users never see "folder_open" etc. as plain text. The class
+   is cleared the moment document.fonts reports the font loaded (or after a 4s
+   safety timeout), so icons appear with no perceptible delay. */
+.fonts-loading .material-symbols-outlined {
+  visibility: hidden;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined Variable', 'Material Symbols Outlined', sans-serif;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-style: normal;
+  font-size: inherit;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbars (theme-aware) ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(var(--scrollbar-thumb)); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--scrollbar-thumb-hover)); }
+
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgb(var(--scrollbar-thumb)); border-radius: 3px; }
+
+/* Hidden scrollbar — used for horizontal chip/filter strips on mobile */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── Leaflet popups (theme-aware) ───────────────────────────────────────── */
+.leaflet-popup-content-wrapper {
+  background: rgb(var(--c-surface)) !important;
+  color: rgb(var(--sl-800)) !important;
+  border: 1px solid rgb(var(--sl-200)) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-pop) !important;
+}
+.leaflet-popup-tip { background: rgb(var(--c-surface)) !important; }
+
+/* ── Recharts chrome (theme-aware) ──────────────────────────────────────────
+   Stylesheet rules beat SVG presentation attributes, so these neutralize the
+   hardcoded light-theme grid/axis/tick hexes inside chart components.       */
+.recharts-cartesian-grid line { stroke: rgb(var(--sl-100)); }
+.recharts-cartesian-axis line,
+.recharts-cartesian-axis-line { stroke: rgb(var(--sl-200)); }
+.recharts-cartesian-axis-tick text,
+.recharts-polar-angle-axis-tick text,
+.recharts-label,
+.recharts-text:not(.recharts-pie-label-text) { fill: rgb(var(--sl-400)); }
+.recharts-tooltip-cursor { fill: rgb(var(--sl-100) / .5); }
+.recharts-default-tooltip {
+  background-color: rgb(var(--c-surface)) !important;
+  border: 1px solid rgb(var(--sl-200)) !important;
+  border-radius: 10px !important;
+  color: rgb(var(--sl-800)) !important;
+}
+
+/* ── FullCalendar (theme-aware) ─────────────────────────────────────────── */
+.fc {
+  --fc-border-color: rgb(var(--sl-200));
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgb(var(--sl-50));
+  --fc-list-event-hover-bg-color: rgb(var(--sl-50));
+  --fc-today-bg-color: rgb(var(--c-primary) / .07);
+  --fc-button-bg-color: rgb(var(--c-surface));
+  --fc-button-border-color: rgb(var(--sl-200));
+  --fc-button-text-color: rgb(var(--sl-700));
+  --fc-button-hover-bg-color: rgb(var(--sl-100));
+  --fc-button-hover-border-color: rgb(var(--sl-300));
+  --fc-button-active-bg-color: rgb(var(--c-primary));
+  --fc-button-active-border-color: rgb(var(--c-primary));
+  --fc-event-text-color: rgb(var(--c-on-primary));
+}
+.fc .fc-button-active { color: rgb(var(--c-on-primary)) !important; }
+.fc .fc-col-header-cell-cushion,
+.fc .fc-daygrid-day-number { color: rgb(var(--sl-700)); }
+.fc .fc-toolbar-title { color: rgb(var(--sl-900)); }

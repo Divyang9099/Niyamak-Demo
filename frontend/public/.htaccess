@@ -1,0 +1,8 @@
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.html [QSA,L]
+
+# Override Content-Security-Policy to allow our API
+Header always unset Content-Security-Policy
+Header always set Content-Security-Policy "default-src 'self'; connect-src 'self' https://api.varunaat.in wss://api.varunaat.in https://api.emailjs.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; media-src 'self' blob:; worker-src 'self' blob:;"

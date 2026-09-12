@@ -1,0 +1,2 @@
+ALTER TABLE pilot_payroll_records ADD COLUMN IF NOT EXISTS days_wfh DECIMAL DEFAULT 0;
+ALTER TABLE pilot_payroll_records ADD COLUMN IF NOT EXISTS days_ot DECIMAL DEFAULT 0;

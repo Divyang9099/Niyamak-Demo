@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- ── Viewport & PWA display ─────────────────────────────────────────── -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- ── Primary meta ───────────────────────────────────────────────────── -->
+    <meta name="description" content="Niyamak — Drone Operations Management Platform. Plan, schedule, and monitor aerial survey missions." />
+    <meta name="application-name" content="Niyamak" />
+    <meta name="author" content="Niyamak" />
+    <meta name="keywords" content="drone operations, aerial survey, mission planning, UAV management" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- ── Theme colour — updated at runtime by ThemeContext ─────────────── -->
+    <!-- Default: Corporate Light (blue accent). JS below keeps it in sync. -->
+    <meta name="theme-color" content="#2563eb" id="meta-theme-color" />
+    <meta name="msapplication-TileColor" content="#121317" />
+    <meta name="msapplication-TileImage" content="/icons/pwa-144x144.png" />
+    <meta name="msapplication-config" content="none" />
+
+    <!-- ── Mobile app capability flags ───────────────────────────────────── -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Niyamak" />
+
+    <!-- ── Windows / Edge specific ───────────────────────────────────────── -->
+    <meta name="msapplication-starturl" content="/" />
+    <meta name="msapplication-window" content="width=1280;height=800" />
+
+    <!-- ── Open Graph (for link previews) ────────────────────────────────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Niyamak" />
+    <meta property="og:description" content="Drone Operations Management Platform" />
+    <meta property="og:image" content="/icons/pwa-512x512.png" />
+
+    <!-- ── Icons ──────────────────────────────────────────────────────────── -->
+    <!-- Keep original PNG favicon — browsers prefer SVG if listed, so PNG only -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- ── Font preload (before JS/CSS chain; removes icon flash on hard refresh) -->
+    <link rel="preload" href="/fonts/material-symbols.woff2" as="font" type="font/woff2" crossorigin />
+
+    <title>Niyamak | Obsidian Prime Dashboard</title>
+
+    <!-- ── Pre-paint theme: applied before React mounts — no flash ───────── -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('varuna_theme');
+          var valid = ['obsidian', 'light', 'midnight', 'forest', 'solar'];
+          document.documentElement.setAttribute(
+            'data-theme', valid.indexOf(t) !== -1 ? t : 'light'
+          );
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+
+    <!-- ── theme-color meta sync with active theme (before React) ─────────── -->
+    <script>
+      (function () {
+        var map = {
+          obsidian: '#8b5cf6',
+          light:    '#2563eb',
+          midnight: '#22d3ee',
+          forest:   '#34d399',
+          solar:    '#ea580c',
+        };
+        try {
+          var t = localStorage.getItem('varuna_theme') || 'light';
+          var color = map[t] || '#2563eb';
+          document.getElementById('meta-theme-color')?.setAttribute('content', color);
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- ── Icon font guard (hides raw ligature text during font download) ─── -->
+    <script>
+      (function () {
+        var el = document.documentElement;
+        el.classList.add('fonts-loading');
+        function reveal() { el.classList.remove('fonts-loading'); }
+        try {
+          if (document.fonts && document.fonts.load) {
+            document.fonts.load("24px 'Material Symbols Outlined Variable'")
+              .then(reveal).catch(reveal);
+            document.fonts.ready.then(reveal).catch(reveal);
+          } else {
+            reveal();
+          }
+        } catch (e) { reveal(); }
+        setTimeout(reveal, 4000);
+      })();
+    </script>
+
+    <!-- ── Window Controls Overlay: draggable title bar when installed ───── -->
+    <style>
+      /* Safe area insets for notched/rounded-corner displays */
+      :root {
+        --safe-top:    env(safe-area-inset-top,    0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left:   env(safe-area-inset-left,   0px);
+        --safe-right:  env(safe-area-inset-right,  0px);
+        /* WCO titlebar area (fallback: 0 when not in WCO mode) */
+        --titlebar-h: env(titlebar-area-height, 0px);
+        --titlebar-x: env(titlebar-area-x,      0px);
+        --titlebar-w: env(titlebar-area-width,  100%);
+      }
+
+      /* When installed in WCO mode, make the app header draggable */
+      @media (display-mode: window-controls-overlay) {
+        body {
+          padding-top: var(--titlebar-h);
+        }
+        /* Any element with .pwa-drag-region becomes part of the window drag area */
+        .pwa-drag-region {
+          -webkit-app-region: drag;
+          app-region: drag;
+          height: var(--titlebar-h);
+          position: fixed;
+          top: 0;
+          left: var(--titlebar-x);
+          width: var(--titlebar-w);
+          z-index: 10000;
+        }
+        /* Buttons inside the drag region must be no-drag so they remain clickable */
+        .pwa-drag-region button,
+        .pwa-drag-region a,
+        .pwa-drag-region input,
+        .pwa-drag-region [role="button"] {
+          -webkit-app-region: no-drag;
+          app-region: no-drag;
+        }
+      }
+
+      /* Standalone mode padding for status bar on mobile */
+      @media (display-mode: standalone) {
+        body { padding-top: var(--safe-top); }
+      }
+    </style>
+  </head>
+  <body class="flex min-h-screen overflow-x-hidden">
+    <!-- WCO drag region (only visible/active in Window Controls Overlay mode) -->
+    <div class="pwa-drag-region" aria-hidden="true"></div>
+
+    <div id="root" class="flex min-h-screen w-full"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
